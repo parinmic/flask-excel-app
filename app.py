@@ -40,19 +40,25 @@ def index():
 @app.route('/product', methods=['GET', 'POST'])
 def product():
     success = False
+    error_msg = None
     
     # อ่านข้อมูลจาก STOCK.xlsx
     products = []
-    if os.path.exists('STOCK.xlsx'):
-        df = pd.read_excel('STOCK.xlsx', header=None, skiprows=3)
-        df.columns = ['col0', 'col1', 'รหัสสินค้า', 'รายการสินค้า', 
-                      'ถุง_1วัน', 'นน_1วัน', 'ถุง_2วัน', 'นน_2วัน', 
-                      'ถุง_3วัน', 'นน_3วัน', 'ถุง_3วัน+', 'นน_3วัน+']
-        df = df[['รหัสสินค้า', 'รายการสินค้า', 'ถุง_1วัน', 'นน_1วัน', 
-                 'ถุง_2วัน', 'นน_2วัน', 'ถุง_3วัน', 'นน_3วัน', 'ถุง_3วัน+', 'นน_3วัน+']]
-        df = df.dropna(subset=['รหัสสินค้า'])
-        df = df.fillna(0)
-        products = df.to_dict('records')
+    try:
+        if os.path.exists('STOCK.xlsx'):
+            df = pd.read_excel('STOCK.xlsx', header=None, skiprows=3)
+            df.columns = ['col0', 'col1', 'รหัสสินค้า', 'รายการสินค้า', 
+                          'ถุง_1วัน', 'นน_1วัน', 'ถุง_2วัน', 'นน_2วัน', 
+                          'ถุง_3วัน', 'นน_3วัน', 'ถุง_3วัน+', 'นน_3วัน+']
+            df = df[['รหัสสินค้า', 'รายการสินค้า', 'ถุง_1วัน', 'นน_1วัน', 
+                     'ถุง_2วัน', 'นน_2วัน', 'ถุง_3วัน', 'นน_3วัน', 'ถุง_3วัน+', 'นน_3วัน+']]
+            df = df.dropna(subset=['รหัสสินค้า'])
+            df = df.fillna(0)
+            products = df.to_dict('records')
+        else:
+            error_msg = "ไม่พบไฟล์ STOCK.xlsx"
+    except Exception as e:
+        error_msg = f"เกิดข้อผิดพลาด: {str(e)}"
     
     if request.method == 'POST':
         # บันทึกข้อมูลทั้งหมดลง Excel (รวมข้อมูลเดิมและตรวจสอบ)
@@ -89,7 +95,7 @@ def product():
             save_df.to_excel(filename, index=False)
             success = True
     
-    return render_template('product.html', products=products, success=success)
+    return render_template('product.html', products=products, success=success, error_msg=error_msg)
 
 if __name__ == '__main__':
     # host='0.0.0.0' เพื่อให้เข้าถึงจากอุปกรณ์อื่นได้
