@@ -1,0 +1,263 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>บันทึกข้อมูลสินค้า</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 1000px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #11998e;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+        .icon {
+            font-size: 50px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .nav-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .nav-link a {
+            color: #11998e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .nav-link a:hover {
+            text-decoration: underline;
+        }
+        .data-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e1e1;
+        }
+        .data-section h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        th {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: center;
+            white-space: nowrap;
+        }
+        td:nth-child(3) {
+            text-align: left;
+        }
+        .check-input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .check-input:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+        .save-btn {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📦</div>
+        <h2>ข้อมูลสินค้า</h2>
+        
+        {% if success %}
+        <div class="success-msg">✅ บันทึกข้อมูลตรวจสอบเรียบร้อยแล้ว!</div>
+        {% endif %}
+        
+        {% if error_msg %}
+        <div class="error-msg">⚠️ {{ error_msg }}</div>
+        {% endif %}
+        
+        {% if products %}
+        <form method="post">
+        <div class="data-section">
+            <h3>📋 รายการสินค้าจาก STOCK</h3>
+            <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">ลำดับ</th>
+                        <th rowspan="2">รหัสสินค้า</th>
+                        <th rowspan="2">รายการสินค้า</th>
+                        <th colspan="3">1 วัน</th>
+                        <th colspan="3">2 วัน</th>
+                        <th colspan="3">3 วัน</th>
+                        <th colspan="3">> 3 วัน</th>
+                    </tr>
+                    <tr>
+                        <th>ถุง</th>
+                        <th>น้ำหนัก</th>
+                        <th>ตรวจสอบ</th>
+                        <th>ถุง</th>
+                        <th>น้ำหนัก</th>
+                        <th>ตรวจสอบ</th>
+                        <th>ถุง</th>
+                        <th>น้ำหนัก</th>
+                        <th>ตรวจสอบ</th>
+                        <th>ถุง</th>
+                        <th>น้ำหนัก</th>
+                        <th>ตรวจสอบ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in products %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ item['รหัสสินค้า'] }}<input type="hidden" name="product_id_{{ loop.index }}" value="{{ item['รหัสสินค้า'] }}"></td>
+                        <td>{{ item['รายการสินค้า'] }}</td>
+                        <td>{{ item['ถุง_1วัน'] }}</td>
+                        <td>{{ item['นน_1วัน'] }}</td>
+                        <td><input type="text" class="check-input" name="check_1_{{ loop.index }}"></td>
+                        <td>{{ item['ถุง_2วัน'] }}</td>
+                        <td>{{ item['นน_2วัน'] }}</td>
+                        <td><input type="text" class="check-input" name="check_2_{{ loop.index }}"></td>
+                        <td>{{ item['ถุง_3วัน'] }}</td>
+                        <td>{{ item['นน_3วัน'] }}</td>
+                        <td><input type="text" class="check-input" name="check_3_{{ loop.index }}"></td>
+                        <td>{{ item['ถุง_3วัน+'] }}</td>
+                        <td>{{ item['นน_3วัน+'] }}</td>
+                        <td><input type="text" class="check-input" name="check_4_{{ loop.index }}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            <button type="submit" class="save-btn">💾 บันทึกข้อมูลตรวจสอบ</button>
+        </div>
+        </form>
+        {% endif %}
+        
+        <p class="footer">ข้อมูลจะถูกบันทึกลงในไฟล์ products.xlsx</p>
+        <div class="nav-link">
+            <a href="/">← กลับหน้าบันทึกข้อมูลทั่วไป</a>
+        </div>
+    </div>
+</body>
+</html>
